@@ -1,0 +1,355 @@
+{
+  "supportedTools": [
+    {
+      "id": "cursor",
+      "name": "Cursor",
+      "vendor": "Anysphere",
+      "category": "Coding IDE",
+      "defaultPlan": "Teams",
+      "benchmarkPrice": 40,
+      "plans": ["Hobby", "Pro", "Pro+", "Ultra", "Teams", "Enterprise"],
+      "usageTypes": ["Daily coding", "Agentic refactors", "PR review", "Experimentation"]
+    },
+    {
+      "id": "copilot",
+      "name": "GitHub Copilot",
+      "vendor": "GitHub",
+      "category": "Coding Assistant",
+      "defaultPlan": "Business",
+      "benchmarkPrice": 19,
+      "plans": ["Free", "Pro", "Pro+", "Business", "Enterprise"],
+      "usageTypes": ["IDE autocomplete", "Code review", "Agent mode", "Docs search"]
+    },
+    {
+      "id": "chatgpt",
+      "name": "ChatGPT",
+      "vendor": "OpenAI",
+      "category": "General AI",
+      "defaultPlan": "Team",
+      "benchmarkPrice": 30,
+      "plans": ["Free", "Plus", "Pro", "Team", "Enterprise"],
+      "usageTypes": ["Writing", "Research", "Data analysis", "Customer ops"]
+    },
+    {
+      "id": "claude",
+      "name": "Claude",
+      "vendor": "Anthropic",
+      "category": "General AI",
+      "defaultPlan": "Team",
+      "benchmarkPrice": 30,
+      "plans": ["Free", "Pro", "Max", "Team", "Enterprise"],
+      "usageTypes": ["Writing", "Coding", "Research", "Long-context analysis"]
+    },
+    {
+      "id": "openai-api",
+      "name": "OpenAI API",
+      "vendor": "OpenAI",
+      "category": "Model API",
+      "defaultPlan": "GPT-5 mini workload",
+      "benchmarkPrice": 680,
+      "plans": ["GPT-5", "GPT-5 mini", "GPT-5 nano", "GPT-4.1", "Batch API"],
+      "usageTypes": ["Production inference", "Batch processing", "Embeddings", "Agents"]
+    },
+    {
+      "id": "anthropic-api",
+      "name": "Anthropic API",
+      "vendor": "Anthropic",
+      "category": "Model API",
+      "defaultPlan": "Claude Sonnet workload",
+      "benchmarkPrice": 920,
+      "plans": ["Claude Opus", "Claude Sonnet", "Claude Haiku", "Batch", "Priority"],
+      "usageTypes": ["Production inference", "Long context", "Code generation", "Research"]
+    },
+    {
+      "id": "gemini",
+      "name": "Gemini",
+      "vendor": "Google",
+      "category": "General AI",
+      "defaultPlan": "AI Pro",
+      "benchmarkPrice": 20,
+      "plans": ["Free", "AI Pro", "AI Ultra", "Workspace add-on", "Gemini API"],
+      "usageTypes": ["Research", "Docs", "Workspace workflows", "Multimodal"]
+    },
+    {
+      "id": "v0",
+      "name": "v0",
+      "vendor": "Vercel",
+      "category": "UI Generation",
+      "defaultPlan": "Team",
+      "benchmarkPrice": 30,
+      "plans": ["Free", "Premium", "Team", "Business", "Enterprise"],
+      "usageTypes": ["Prototype generation", "Frontend design", "Component drafts", "PM demos"]
+    },
+    {
+      "id": "windsurf",
+      "name": "Windsurf",
+      "vendor": "Codeium",
+      "category": "Coding IDE",
+      "defaultPlan": "Teams",
+      "benchmarkPrice": 35,
+      "plans": ["Free", "Pro", "Max", "Teams", "Enterprise"],
+      "usageTypes": ["Daily coding", "Agent workflows", "Code search", "Refactors"]
+    }
+  ],
+  "defaultAuditInput": {
+    "teamSize": 12,
+    "primaryUseCase": "Mixed",
+    "monthlyBudget": 4200,
+    "painPoints": ["Unused seats", "API bill volatility", "Too many overlapping AI coding tools"],
+    "tools": [
+      {
+        "id": "cursor",
+        "selected": true,
+        "plan": "Teams",
+        "monthlySpend": 720,
+        "seats": 18,
+        "usageType": "Daily coding"
+      },
+      {
+        "id": "copilot",
+        "selected": true,
+        "plan": "Business",
+        "monthlySpend": 228,
+        "seats": 12,
+        "usageType": "IDE autocomplete"
+      },
+      {
+        "id": "chatgpt",
+        "selected": true,
+        "plan": "Team",
+        "monthlySpend": 540,
+        "seats": 18,
+        "usageType": "Writing"
+      },
+      {
+        "id": "claude",
+        "selected": true,
+        "plan": "Max",
+        "monthlySpend": 1000,
+        "seats": 10,
+        "usageType": "Long-context analysis"
+      },
+      {
+        "id": "openai-api",
+        "selected": true,
+        "plan": "GPT-5 workload",
+        "monthlySpend": 1650,
+        "seats": 1,
+        "usageType": "Production inference"
+      },
+      {
+        "id": "anthropic-api",
+        "selected": true,
+        "plan": "Claude Sonnet workload",
+        "monthlySpend": 1180,
+        "seats": 1,
+        "usageType": "Code generation"
+      },
+      {
+        "id": "v0",
+        "selected": true,
+        "plan": "Team",
+        "monthlySpend": 360,
+        "seats": 12,
+        "usageType": "Prototype generation"
+      },
+      {
+        "id": "gemini",
+        "selected": false,
+        "plan": "AI Pro",
+        "monthlySpend": 0,
+        "seats": 0,
+        "usageType": "Research"
+      },
+      {
+        "id": "windsurf",
+        "selected": false,
+        "plan": "Teams",
+        "monthlySpend": 0,
+        "seats": 0,
+        "usageType": "Daily coding"
+      }
+    ]
+  },
+  "auditResults": {
+    "summary": {
+      "currentMonthlySpend": 5678,
+      "potentialMonthlySavings": 1642,
+      "potentialAnnualSavings": 19704,
+      "efficiencyScore": 68,
+      "spendPerEmployee": 473,
+      "teamSize": 12
+    },
+    "breakdown": [
+      {
+        "tool": "Cursor",
+        "currentPlan": "Teams",
+        "currentCost": 720,
+        "recommendedAction": "Reduce paid seats to active engineers",
+        "suggestedAlternative": "12 Cursor Teams seats + pooled usage controls",
+        "monthlySavings": 240,
+        "annualSavings": 2880,
+        "priority": "High"
+      },
+      {
+        "tool": "Claude",
+        "currentPlan": "Max",
+        "currentCost": 1000,
+        "recommendedAction": "Downgrade most users from Max",
+        "suggestedAlternative": "Claude Team for 8 users + Max for 2 power users",
+        "monthlySavings": 540,
+        "annualSavings": 6480,
+        "priority": "High"
+      },
+      {
+        "tool": "OpenAI API",
+        "currentPlan": "GPT-5 workload",
+        "currentCost": 1650,
+        "recommendedAction": "Route routine tasks to cheaper models",
+        "suggestedAlternative": "GPT-5 mini, caching, and Batch API for async jobs",
+        "monthlySavings": 480,
+        "annualSavings": 5760,
+        "priority": "High"
+      },
+      {
+        "tool": "Anthropic API",
+        "currentPlan": "Claude Sonnet workload",
+        "currentCost": 1180,
+        "recommendedAction": "Enable prompt caching and classify low-risk tasks",
+        "suggestedAlternative": "Claude Haiku for routing + Sonnet for complex work",
+        "monthlySavings": 260,
+        "annualSavings": 3120,
+        "priority": "Medium"
+      },
+      {
+        "tool": "ChatGPT",
+        "currentPlan": "Team",
+        "currentCost": 540,
+        "recommendedAction": "Remove inactive seats",
+        "suggestedAlternative": "12 ChatGPT Team seats",
+        "monthlySavings": 180,
+        "annualSavings": 2160,
+        "priority": "Medium"
+      },
+      {
+        "tool": "v0",
+        "currentPlan": "Team",
+        "currentCost": 360,
+        "recommendedAction": "Move occasional users to shared workflow",
+        "suggestedAlternative": "Premium for design lead + Team for core pod",
+        "monthlySavings": 120,
+        "annualSavings": 1440,
+        "priority": "Low"
+      },
+      {
+        "tool": "GitHub Copilot",
+        "currentPlan": "Business",
+        "currentCost": 228,
+        "recommendedAction": "Keep current plan",
+        "suggestedAlternative": "No change",
+        "monthlySavings": 0,
+        "annualSavings": 0,
+        "priority": "Optimized"
+      }
+    ],
+    "recommendations": [
+      {
+        "title": "Unlock discounted AI infrastructure credits",
+        "body": "Your projected savings exceed $500/month. Talk to Credex to explore AI infrastructure credits, committed-use discounts, and vendor routing.",
+        "impact": "$9,600 annual upside",
+        "priority": "Critical"
+      },
+      {
+        "title": "Right-size Claude Max usage",
+        "body": "Claude Max is useful for power users, but most seats can move to Claude Team without hurting daily writing or coding workflows.",
+        "impact": "$6,480 annual savings",
+        "priority": "High"
+      },
+      {
+        "title": "Separate API workloads by complexity",
+        "body": "Route summarization and classification workloads to mini or Haiku-class models; reserve frontier models for reasoning-heavy paths.",
+        "impact": "$8,880 annual savings",
+        "priority": "High"
+      },
+      {
+        "title": "Consolidate coding assistants",
+        "body": "Cursor, Copilot, and Windsurf-style tools overlap heavily. Standardize primary workflows and keep one secondary option for trials.",
+        "impact": "$2,880 annual savings",
+        "priority": "Medium"
+      }
+    ],
+    "insights": [
+      {
+        "title": "Your team could save 28% annually by switching plans.",
+        "body": "The largest opportunity comes from moving non-power users off Claude Max and matching Cursor seats to active engineers.",
+        "type": "Opportunity",
+        "priority": "High",
+        "trend": "+28%"
+      },
+      {
+        "title": "You are underutilizing enterprise seats.",
+        "body": "Seat count exceeds team size across two subscriptions, indicating stale invites or shared-role over-allocation.",
+        "type": "Waste Detection",
+        "priority": "High",
+        "trend": "18 seats"
+      },
+      {
+        "title": "Your API spend exceeds similar teams of your size.",
+        "body": "The model API line is 2.1x above the benchmark for a 12-person mixed-use startup stack.",
+        "type": "Risk Detection",
+        "priority": "Medium",
+        "trend": "2.1x"
+      },
+      {
+        "title": "Potential annual savings: $19,704.",
+        "body": "Savings are achievable through plan changes, prompt caching, workload tiering, and credit negotiation.",
+        "type": "Forecast",
+        "priority": "Critical",
+        "trend": "$19.7K"
+      }
+    ],
+    "monthlySpendTrend": [
+      { "month": "Jan", "spend": 3410, "optimized": 2890 },
+      { "month": "Feb", "spend": 3980, "optimized": 3110 },
+      { "month": "Mar", "spend": 4520, "optimized": 3325 },
+      { "month": "Apr", "spend": 4920, "optimized": 3510 },
+      { "month": "May", "spend": 5360, "optimized": 3840 },
+      { "month": "Jun", "spend": 5678, "optimized": 4036 }
+    ],
+    "vendorBreakdown": [
+      { "name": "OpenAI", "value": 2190, "color": "#3B82F6" },
+      { "name": "Anthropic", "value": 2180, "color": "#8B5CF6" },
+      { "name": "Cursor", "value": 720, "color": "#10B981" },
+      { "name": "GitHub", "value": 228, "color": "#F59E0B" },
+      { "name": "Vercel", "value": 360, "color": "#F43F5E" }
+    ],
+    "categorySpend": [
+      { "category": "Coding Seats", "current": 948, "optimized": 708 },
+      { "category": "Chat Seats", "current": 1540, "optimized": 820 },
+      { "category": "Model APIs", "current": 2830, "optimized": 2090 },
+      { "category": "UI Generation", "current": 360, "optimized": 240 }
+    ],
+    "savingsForecast": [
+      { "month": "Jul", "savings": 1642 },
+      { "month": "Aug", "savings": 3284 },
+      { "month": "Sep", "savings": 4926 },
+      { "month": "Oct", "savings": 6568 },
+      { "month": "Nov", "savings": 8210 },
+      { "month": "Dec", "savings": 9852 }
+    ],
+    "efficiencyTrend": [
+      { "week": "W1", "score": 52 },
+      { "week": "W2", "score": 58 },
+      { "week": "W3", "score": 63 },
+      { "week": "W4", "score": 68 },
+      { "week": "Target", "score": 86 }
+    ],
+    "toolComparison": [
+      { "tool": "Cursor", "current": 60, "benchmark": 40 },
+      { "tool": "Copilot", "current": 19, "benchmark": 19 },
+      { "tool": "ChatGPT", "current": 45, "benchmark": 30 },
+      { "tool": "Claude", "current": 100, "benchmark": 30 },
+      { "tool": "v0", "current": 30, "benchmark": 24 }
+    ]
+  }
+}

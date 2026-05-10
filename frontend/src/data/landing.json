@@ -1,0 +1,94 @@
+{
+  "logos": ["Stripe", "Linear", "Vercel", "Retool", "Ramp", "Brex"],
+  "features": [
+    {
+      "title": "AI Stack Inventory",
+      "description": "Map every seat, plan, vendor, and API workload across Cursor, Copilot, ChatGPT, Claude, Gemini, v0, and model providers.",
+      "icon": "Boxes"
+    },
+    {
+      "title": "Plan Optimization",
+      "description": "Detect over-provisioned seats, duplicate subscriptions, and mismatched team plans before renewals lock in.",
+      "icon": "BadgeDollarSign"
+    },
+    {
+      "title": "API Spend Intelligence",
+      "description": "Compare model usage against cheaper alternatives, caching strategies, batch processing, and credit opportunities.",
+      "icon": "BrainCircuit"
+    },
+    {
+      "title": "Credex Credit Routing",
+      "description": "High-spend teams get a clear path to discounted AI infrastructure credits and vendor negotiation support.",
+      "icon": "Handshake"
+    }
+  ],
+  "howItWorks": [
+    {
+      "step": "01",
+      "title": "Enter your AI stack",
+      "description": "Add tools, plan names, monthly spend, seat counts, team size, use cases, and budget pressure."
+    },
+    {
+      "step": "02",
+      "title": "Run the audit model",
+      "description": "Spendlens benchmarks your spend against startup patterns and current pricing assumptions."
+    },
+    {
+      "step": "03",
+      "title": "Prioritize savings",
+      "description": "Get downgrade, consolidation, API, and credit recommendations ranked by impact and risk."
+    }
+  ],
+  "stats": [
+    { "label": "Average Monthly Savings", "value": 31, "suffix": "%" },
+    { "label": "AI Tools Benchmarked", "value": 8, "suffix": "+" },
+    { "label": "Spend Flagged", "value": 2.4, "suffix": "M" },
+    { "label": "Audit Time", "value": 4, "suffix": " min" }
+  ],
+  "testimonials": [
+    {
+      "name": "Riya Mehta",
+      "role": "Founder, VectorLoop",
+      "quote": "Spendlens found three duplicated AI subscriptions and a credit opportunity before our seed round budget review."
+    },
+    {
+      "name": "Noah Kim",
+      "role": "CTO, Relaybase",
+      "quote": "The report felt like something our finance and engineering teams could both trust. We cut spend without slowing developers down."
+    },
+    {
+      "name": "Amara Lewis",
+      "role": "VP Engineering, Stackwell",
+      "quote": "It turned scattered Cursor, Copilot, Claude, and API invoices into a clear optimization plan in minutes."
+    }
+  ],
+  "pricing": [
+    {
+      "name": "Free Audit",
+      "price": "$0",
+      "description": "For founders and engineering leads who want a fast AI spend snapshot.",
+      "features": ["Stack input flow", "Savings estimate", "Shareable report", "Credex credit prompt"]
+    },
+    {
+      "name": "Enterprise Consultation",
+      "price": "Custom",
+      "description": "For teams spending heavily on model APIs, coding agents, and AI seats.",
+      "features": ["Vendor negotiation support", "Credit routing", "Usage architecture review", "Executive readout"],
+      "featured": true
+    }
+  ],
+  "faqs": [
+    {
+      "question": "Is this for personal finance?",
+      "answer": "No. Spendlens audits AI infrastructure and AI tool spend for startups, CTOs, engineering managers, and finance operators."
+    },
+    {
+      "question": "Does the audit connect to real invoices?",
+      "answer": "This portfolio version uses dummy data and manual inputs. A production version could connect billing exports, SSO seat data, and API usage logs."
+    },
+    {
+      "question": "When should I talk to Credex?",
+      "answer": "If potential savings exceed $500/month or your API spend is growing quickly, Credex can help unlock AI infrastructure credits and better purchasing paths."
+    }
+  ]
+}
