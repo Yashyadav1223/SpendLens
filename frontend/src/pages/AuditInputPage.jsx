@@ -1,56 +1,63 @@
-import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { AlertCircle, ArrowRight, CheckCircle2, ChevronLeft, Cpu, WalletCards } from 'lucide-react'
-import auditData from '../data/audit.json'
-import { Button } from '../components/ui/Button'
-import { Card } from '../components/ui/Card'
-import { Input } from '../components/ui/Input'
-import { SectionHeader } from '../components/ui/SectionHeader'
-import { useLocalStorage } from '../hooks/useLocalStorage'
-import { createAudit } from '../services/apiClient'
-import { buildAuditPayload } from '../utils/auditAdapters'
-import { formatCurrency } from '../utils/formatters'
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  ChevronLeft,
+  Cpu,
+  WalletCards,
+} from "lucide-react";
+import auditData from "../data/audit.json";
+import { Button } from "../components/ui/Button";
+import { Card } from "../components/ui/Card";
+import { Input } from "../components/ui/Input";
+import { SectionHeader } from "../components/ui/SectionHeader";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { createAudit, createReport } from "../services/apiClient";
+import { buildAuditPayload } from "../utils/auditAdapters";
+import { formatCurrency } from "../utils/formatters";
 
-const steps = ['AI stack', 'Team usage', 'Review']
-const useCases = ['Coding', 'Writing', 'Research', 'Data Analysis', 'Mixed']
+const steps = ["AI stack", "Team usage", "Review"];
+const useCases = ["Coding", "Writing", "Research", "Data Analysis", "Mixed"];
 const painPointOptions = [
-  'Unused seats',
-  'API bill volatility',
-  'Too many overlapping AI coding tools',
-  'No vendor credits',
-  'Unclear team adoption',
-  'Finance needs proof before renewal',
-]
+  "Unused seats",
+  "API bill volatility",
+  "Too many overlapping AI coding tools",
+  "No vendor credits",
+  "Unclear team adoption",
+  "Finance needs proof before renewal",
+];
 
 export function AuditInputPage() {
-  const navigate = useNavigate()
-  const [step, setStep] = useState(0)
+  const navigate = useNavigate();
+  const [step, setStep] = useState(0);
   const [form, setForm] = useLocalStorage(
-    'spendlens-audit-input',
+    "spendlens-audit-input",
     auditData.defaultAuditInput,
-  )
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState('')
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const selectedTools = useMemo(
     () => form.tools.filter((tool) => tool.selected),
     [form.tools],
-  )
+  );
   const monthlySpend = selectedTools.reduce(
     (sum, tool) => sum + Number(tool.monthlySpend || 0),
     0,
-  )
+  );
   const selectedSeats = selectedTools.reduce(
     (sum, tool) => sum + Number(tool.seats || 0),
     0,
-  )
+  );
 
   const canContinue =
     step === 0
       ? selectedTools.length > 0
       : step === 1
         ? Number(form.teamSize) > 0 && Number(form.monthlyBudget) > 0
-        : true
+        : true;
 
   function updateTool(id, patch) {
     setForm((current) => ({
@@ -58,39 +65,55 @@ export function AuditInputPage() {
       tools: current.tools.map((tool) =>
         tool.id === id ? { ...tool, ...patch } : tool,
       ),
-    }))
+    }));
   }
 
   function togglePainPoint(point) {
     setForm((current) => {
-      const exists = current.painPoints.includes(point)
+      const exists = current.painPoints.includes(point);
       return {
         ...current,
         painPoints: exists
           ? current.painPoints.filter((item) => item !== point)
           : [...current.painPoints, point],
-      }
-    })
+      };
+    });
   }
 
   async function handleGenerateAudit() {
-    setIsSubmitting(true)
-    setSubmitError('')
+    setIsSubmitting(true);
+    setSubmitError("");
 
     try {
-      const auditResult = await createAudit(buildAuditPayload(form))
-      window.localStorage.setItem('spendlens-audit-result', JSON.stringify(auditResult))
-      navigate('/app')
+      const payload = buildAuditPayload(form);
+      const auditResult = await createAudit(payload);
+      window.localStorage.setItem(
+        "spendlens-audit-result",
+        JSON.stringify(auditResult),
+      );
+
+      // Now create the shareable report in Supabase from this audit
+      try {
+        await createReport({
+          title: `Audit - ${new Date().toISOString().split('T')[0]}`,
+          auditInput: payload,
+          auditResult: auditResult,
+        });
+      } catch (reportError) {
+        console.error("Failed to create report in Supabase:", reportError);
+      }
+
+      navigate("/app");
     } catch (error) {
-      setSubmitError(error.message)
+      setSubmitError(error.message);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
   function handleDemoAudit() {
-    window.localStorage.removeItem('spendlens-audit-result')
-    navigate('/app')
+    window.localStorage.removeItem("spendlens-audit-result");
+    navigate("/app");
   }
 
   return (
@@ -109,17 +132,21 @@ export function AuditInputPage() {
                 <button
                   className={`flex min-w-40 items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${
                     index === step
-                      ? 'border-primary/50 bg-primary/15 text-white'
+                      ? "border-primary/50 bg-primary/15 text-white"
                       : index < step
-                        ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'
-                        : 'border-white/10 bg-white/[0.04] text-slate-400'
+                        ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
+                        : "border-white/10 bg-white/[0.04] text-slate-400"
                   }`}
                   key={item}
                   onClick={() => setStep(index)}
                   type="button"
                 >
                   <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/10 text-sm font-bold">
-                    {index < step ? <CheckCircle2 className="h-4 w-4" /> : index + 1}
+                    {index < step ? (
+                      <CheckCircle2 className="h-4 w-4" />
+                    ) : (
+                      index + 1
+                    )}
                   </span>
                   <span className="text-sm font-semibold">{item}</span>
                 </button>
@@ -140,13 +167,15 @@ export function AuditInputPage() {
               </div>
               <div className="grid gap-4 lg:grid-cols-2">
                 {auditData.supportedTools.map((toolMeta) => {
-                  const tool = form.tools.find((item) => item.id === toolMeta.id)
+                  const tool = form.tools.find(
+                    (item) => item.id === toolMeta.id,
+                  );
                   return (
                     <article
                       className={`rounded-2xl border p-4 transition ${
                         tool.selected
-                          ? 'border-primary/40 bg-primary/10'
-                          : 'border-white/10 bg-white/[0.04]'
+                          ? "border-primary/40 bg-primary/10"
+                          : "border-white/10 bg-white/[0.04]"
                       }`}
                       key={toolMeta.id}
                     >
@@ -181,7 +210,9 @@ export function AuditInputPage() {
                         <Select
                           disabled={!tool.selected}
                           onChange={(event) =>
-                            updateTool(toolMeta.id, { plan: event.target.value })
+                            updateTool(toolMeta.id, {
+                              plan: event.target.value,
+                            })
                           }
                           value={tool.plan}
                         >
@@ -192,7 +223,9 @@ export function AuditInputPage() {
                         <Select
                           disabled={!tool.selected}
                           onChange={(event) =>
-                            updateTool(toolMeta.id, { usageType: event.target.value })
+                            updateTool(toolMeta.id, {
+                              usageType: event.target.value,
+                            })
                           }
                           value={tool.usageType}
                         >
@@ -228,7 +261,7 @@ export function AuditInputPage() {
                         />
                       </div>
                     </article>
-                  )
+                  );
                 })}
               </div>
             </Card>
@@ -297,13 +330,13 @@ export function AuditInputPage() {
                 </p>
                 <div className="grid gap-3 md:grid-cols-2">
                   {painPointOptions.map((point) => {
-                    const selected = form.painPoints.includes(point)
+                    const selected = form.painPoints.includes(point);
                     return (
                       <button
                         className={`rounded-2xl border p-4 text-left text-sm font-medium transition ${
                           selected
-                            ? 'border-primary/40 bg-primary/10 text-white'
-                            : 'border-white/10 bg-white/[0.04] text-slate-400 hover:text-white'
+                            ? "border-primary/40 bg-primary/10 text-white"
+                            : "border-white/10 bg-white/[0.04] text-slate-400 hover:text-white"
                         }`}
                         key={point}
                         onClick={() => togglePainPoint(point)}
@@ -311,7 +344,7 @@ export function AuditInputPage() {
                       >
                         {point}
                       </button>
-                    )
+                    );
                   })}
                 </div>
               </div>
@@ -330,15 +363,26 @@ export function AuditInputPage() {
                 </p>
               </div>
               <div className="grid gap-4 md:grid-cols-3">
-                <ReviewMetric label="Active AI tools" value={selectedTools.length} />
-                <ReviewMetric label="Monthly AI spend" value={formatCurrency(monthlySpend)} />
-                <ReviewMetric label="Spend per employee" value={formatCurrency(monthlySpend / Math.max(Number(form.teamSize), 1))} />
+                <ReviewMetric
+                  label="Active AI tools"
+                  value={selectedTools.length}
+                />
+                <ReviewMetric
+                  label="Monthly AI spend"
+                  value={formatCurrency(monthlySpend)}
+                />
+                <ReviewMetric
+                  label="Spend per employee"
+                  value={formatCurrency(
+                    monthlySpend / Math.max(Number(form.teamSize), 1),
+                  )}
+                />
               </div>
               <div className="mt-6 rounded-2xl border border-orange-400/20 bg-orange-400/10 p-4">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="mt-0.5 h-5 w-5 text-orange-300" />
                   <p className="text-sm leading-6 text-orange-100">
-                    Based on the demo benchmark, stacks over{' '}
+                    Based on the demo benchmark, stacks over{" "}
                     {formatCurrency(5000)} per month are flagged for Credex
                     credit routing and vendor consolidation.
                   </p>
@@ -379,7 +423,9 @@ export function AuditInputPage() {
               <Button
                 disabled={!canContinue}
                 icon={ArrowRight}
-                onClick={() => setStep((current) => Math.min(current + 1, steps.length - 1))}
+                onClick={() =>
+                  setStep((current) => Math.min(current + 1, steps.length - 1))
+                }
                 type="button"
               >
                 Continue
@@ -391,7 +437,9 @@ export function AuditInputPage() {
                 onClick={handleGenerateAudit}
                 type="button"
               >
-                {isSubmitting ? 'Generating audit...' : 'Generate Audit Results'}
+                {isSubmitting
+                  ? "Generating audit..."
+                  : "Generate Audit Results"}
               </Button>
             )}
           </div>
@@ -402,18 +450,32 @@ export function AuditInputPage() {
             Dynamic summary
           </p>
           <div className="mt-6 space-y-4">
-            <SummaryRow label="Monthly AI spend" value={formatCurrency(monthlySpend)} />
-            <SummaryRow label="Monthly budget" value={formatCurrency(form.monthlyBudget)} />
+            <SummaryRow
+              label="Monthly AI spend"
+              value={formatCurrency(monthlySpend)}
+            />
+            <SummaryRow
+              label="Monthly budget"
+              value={formatCurrency(form.monthlyBudget)}
+            />
             <SummaryRow label="Active tools" value={selectedTools.length} />
             <SummaryRow label="Seat allocations" value={selectedSeats} />
             <SummaryRow
               label="Budget variance"
-              value={formatCurrency(monthlySpend - Number(form.monthlyBudget || 0))}
-              tone={monthlySpend > Number(form.monthlyBudget || 0) ? 'warning' : 'success'}
+              value={formatCurrency(
+                monthlySpend - Number(form.monthlyBudget || 0),
+              )}
+              tone={
+                monthlySpend > Number(form.monthlyBudget || 0)
+                  ? "warning"
+                  : "success"
+              }
             />
           </div>
           <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/10 p-4">
-            <p className="text-sm font-semibold text-white">Estimated savings range</p>
+            <p className="text-sm font-semibold text-white">
+              Estimated savings range
+            </p>
             <p className="mt-2 text-3xl font-bold text-emerald-300">
               {formatCurrency(Math.round(monthlySpend * 0.18))}-
               {formatCurrency(Math.round(monthlySpend * 0.31))}
@@ -426,15 +488,18 @@ export function AuditInputPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
 function Select({ children, ...props }) {
   return (
-    <select className="app-input h-12 w-full px-4 text-sm disabled:opacity-40" {...props}>
+    <select
+      className="app-input h-12 w-full px-4 text-sm disabled:opacity-40"
+      {...props}
+    >
       {children}
     </select>
-  )
+  );
 }
 
 function ReviewMetric({ label, value }) {
@@ -443,7 +508,7 @@ function ReviewMetric({ label, value }) {
       <p className="text-sm text-[var(--text-muted)]">{label}</p>
       <p className="mt-2 text-2xl font-bold text-[var(--text-main)]">{value}</p>
     </div>
-  )
+  );
 }
 
 function SummaryRow({ label, tone, value }) {
@@ -452,15 +517,15 @@ function SummaryRow({ label, tone, value }) {
       <span className="text-sm text-[var(--text-muted)]">{label}</span>
       <span
         className={`text-sm font-semibold ${
-          tone === 'warning'
-            ? 'text-orange-300'
-            : tone === 'success'
-              ? 'text-emerald-300'
-              : 'text-[var(--text-main)]'
+          tone === "warning"
+            ? "text-orange-300"
+            : tone === "success"
+              ? "text-emerald-300"
+              : "text-[var(--text-main)]"
         }`}
       >
         {value}
       </span>
     </div>
-  )
+  );
 }
