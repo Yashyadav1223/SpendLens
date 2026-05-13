@@ -4,8 +4,8 @@ Spendlens is a B2B SaaS AI infrastructure spend audit platform for startup found
 
 ## Live Links
 
-- Deployed frontend: add Vercel URL before submission
-- Deployed backend: add Render/Railway URL before submission
+- Deployed frontend: https://spend-lens-steel.vercel.app/
+- Deployed backend: https://spendlens-akxc.onrender.com
 - GitHub repo: https://github.com/Yashyadav1223/SpendLens
 
 ## Screenshots
