@@ -8,15 +8,121 @@ type SummaryInput = {
 
 export async function generateAuditSummary(input: SummaryInput) {
   const fallback = buildFallbackSummary(input)
+  const failureReasons: string[] = []
 
-  if (!env.ANTHROPIC_API_KEY) {
-    return {
-      summary: fallback,
-      provider: 'template-fallback',
-      fallback: true,
+  if (env.GEMINI_API_KEY) {
+    const geminiResult = await tryGeminiSummary(input)
+
+    if (geminiResult.ok) {
+      return {
+        summary: geminiResult.summary,
+        provider: 'gemini',
+        model: env.GEMINI_MODEL,
+        fallback: false,
+      }
     }
+
+    failureReasons.push(`Gemini: ${geminiResult.reason}`)
+  } else {
+    failureReasons.push('Gemini: GEMINI_API_KEY is not configured')
   }
 
+  if (env.ANTHROPIC_API_KEY) {
+    const claudeResult = await tryClaudeSummary(input)
+
+    if (claudeResult.ok) {
+      return {
+        summary: claudeResult.summary,
+        provider: 'anthropic',
+        model: env.ANTHROPIC_MODEL,
+        fallback: true,
+        fallbackFrom: 'gemini',
+      }
+    }
+
+    failureReasons.push(`Claude: ${claudeResult.reason}`)
+  } else {
+    failureReasons.push('Claude: ANTHROPIC_API_KEY is not configured')
+  }
+
+  return {
+    summary: fallback,
+    provider: 'template-fallback',
+    fallback: true,
+    reasons: failureReasons,
+  }
+}
+
+async function tryGeminiSummary(input: SummaryInput) {
+  try {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${env.GEMINI_MODEL}:generateContent?key=${env.GEMINI_API_KEY}`
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [
+            {
+              text: 'You are a concise SaaS audit analyst. Write honest, finance-literate summaries for engineering leaders. Do not exaggerate savings.',
+            },
+          ],
+        },
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: buildSummaryPrompt(input) }],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 220,
+        },
+      }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      return {
+        ok: false as const,
+        reason: `HTTP ${response.status} ${errorText.slice(0, 180)}`,
+      }
+    }
+
+    const data = (await response.json()) as {
+      candidates?: Array<{
+        content?: {
+          parts?: Array<{ text?: string }>
+        }
+      }>
+    }
+
+    const text = data.candidates?.[0]?.content?.parts
+      ?.map((part) => part.text ?? '')
+      .join('\n')
+      .trim()
+
+    if (!text || text.length < 40) {
+      return {
+        ok: false as const,
+        reason: 'empty or invalid Gemini response',
+      }
+    }
+
+    return {
+      ok: true as const,
+      summary: text,
+    }
+  } catch (error) {
+    return {
+      ok: false as const,
+      reason: error instanceof Error ? error.message : 'Unknown Gemini failure',
+    }
+  }
+}
+
+async function tryClaudeSummary(input: SummaryInput) {
   try {
     const anthropic = new Anthropic({
       apiKey: env.ANTHROPIC_API_KEY,
@@ -44,23 +150,19 @@ export async function generateAuditSummary(input: SummaryInput) {
 
     if (!text || text.length < 40) {
       return {
-        summary: fallback,
-        provider: 'template-fallback',
-        fallback: true,
+        ok: false as const,
+        reason: 'empty or invalid Claude response',
       }
     }
 
     return {
+      ok: true as const,
       summary: text,
-      provider: 'anthropic',
-      fallback: false,
     }
   } catch (error) {
     return {
-      summary: fallback,
-      provider: 'template-fallback',
-      fallback: true,
-      reason: error instanceof Error ? error.message : 'Unknown AI summary failure',
+      ok: false as const,
+      reason: error instanceof Error ? error.message : 'Unknown Claude failure',
     }
   }
 }

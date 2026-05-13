@@ -26,8 +26,8 @@
       "vendor": "OpenAI",
       "category": "General AI",
       "defaultPlan": "Team",
-      "benchmarkPrice": 30,
-      "plans": ["Free", "Plus", "Pro", "Team", "Enterprise"],
+      "benchmarkPrice": 25,
+      "plans": ["Free", "Plus", "Pro", "Business", "Team", "Enterprise"],
       "usageTypes": ["Writing", "Research", "Data analysis", "Customer ops"]
     },
     {
@@ -36,8 +36,8 @@
       "vendor": "Anthropic",
       "category": "General AI",
       "defaultPlan": "Team",
-      "benchmarkPrice": 30,
-      "plans": ["Free", "Pro", "Max", "Team", "Enterprise"],
+      "benchmarkPrice": 25,
+      "plans": ["Free", "Pro", "Max", "Team", "Team Premium", "Enterprise"],
       "usageTypes": ["Writing", "Coding", "Research", "Long-context analysis"]
     },
     {
@@ -66,7 +66,7 @@
       "vendor": "Google",
       "category": "General AI",
       "defaultPlan": "AI Pro",
-      "benchmarkPrice": 20,
+      "benchmarkPrice": 19.99,
       "plans": ["Free", "AI Pro", "AI Ultra", "Workspace add-on", "Gemini API"],
       "usageTypes": ["Research", "Docs", "Workspace workflows", "Multimodal"]
     },
@@ -86,7 +86,7 @@
       "vendor": "Codeium",
       "category": "Coding IDE",
       "defaultPlan": "Teams",
-      "benchmarkPrice": 35,
+      "benchmarkPrice": 40,
       "plans": ["Free", "Pro", "Max", "Teams", "Enterprise"],
       "usageTypes": ["Daily coding", "Agent workflows", "Code search", "Refactors"]
     }
@@ -116,8 +116,8 @@
       {
         "id": "chatgpt",
         "selected": true,
-        "plan": "Team",
-        "monthlySpend": 540,
+        "plan": "Business",
+        "monthlySpend": 450,
         "seats": 18,
         "usageType": "Writing"
       },

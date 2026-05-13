@@ -58,7 +58,7 @@ describe('auditEngine', () => {
       },
     )
 
-    expect(result.monthlySavings).toBe(120)
+    expect(result.monthlySavings).toBe(100)
     expect(result.recommendedAction).toContain('Remove 4')
   })
 
@@ -78,7 +78,7 @@ describe('auditEngine', () => {
     )
 
     expect(result.monthlySavings).toBe(560)
-    expect(result.recommendedAction).toContain('model routing')
+    expect(result.recommendedAction).toContain('Classify workloads')
     expect(result.suggestedAlternative).toContain('Batch API')
   })
 
@@ -124,8 +124,48 @@ describe('auditEngine', () => {
       },
     )
 
-    expect(result.recommendedPlan).toBe('Team')
-    expect(result.monthlySavings).toBe(700)
+    expect(result.recommendedPlan).toBe('Team Standard')
+    expect(result.monthlySavings).toBe(750)
     expect(result.reason).toContain('Power plans')
+  })
+
+  it('uses invoice reconciliation when reported spend exceeds list pricing', () => {
+    const result = analyzeTool(
+      {
+        tool: 'ChatGPT',
+        plan: 'Business',
+        seats: 10,
+        monthlySpend: 600,
+      },
+      {
+        teamSize: 10,
+        useCase: 'Writing',
+        selectedToolKeys: new Set(['chatgpt']),
+      },
+    )
+
+    expect(result.monthlySavings).toBe(350)
+    expect(result.recommendedAction).toContain('Reconcile invoice')
+    expect(result.reason).toContain('above list-price expectations')
+  })
+
+  it('keeps unknown tools honest instead of fabricating savings', () => {
+    const result = analyzeTool(
+      {
+        tool: 'Internal LLM Gateway',
+        plan: 'Custom',
+        seats: 1,
+        monthlySpend: 900,
+      },
+      {
+        teamSize: 8,
+        useCase: 'Mixed',
+        selectedToolKeys: new Set(),
+      },
+    )
+
+    expect(result.monthlySavings).toBe(0)
+    expect(result.severity).toBe('optimized')
+    expect(result.reason).toContain('not in the current Spendlens pricing catalog')
   })
 })

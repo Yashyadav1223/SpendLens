@@ -33,7 +33,5 @@ app.use(notFoundHandler)
 app.use(errorHandler)
 
 if (!isTest) {
-  app.listen(env.PORT, () => {
-    console.log(`Spendlens API listening on port ${env.PORT}`)
-  })
+  app.listen(env.PORT)
 }

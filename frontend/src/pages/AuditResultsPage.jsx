@@ -15,14 +15,16 @@ import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { DashboardSkeleton } from '../components/ui/LoadingSkeleton'
 import { SectionHeader } from '../components/ui/SectionHeader'
+import { adaptAuditResult } from '../utils/auditAdapters'
 import { formatCurrency } from '../utils/formatters'
 
 export function AuditResultsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLeadOpen, setIsLeadOpen] = useState(false)
-  const { auditResults } = auditData
+  const [auditResults] = useState(() => loadAuditResults())
   const { summary } = auditResults
-  const hasHighSavings = summary.potentialMonthlySavings > 500
+  const hasHighSavings =
+    auditResults.creditOpportunity || summary.potentialMonthlySavings > 500
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsLoading(false), 620)
@@ -45,6 +47,12 @@ export function AuditResultsPage() {
         eyebrow="Audit Results"
         title="AI infrastructure spend audit"
       />
+
+      <div className="inline-flex rounded-full border border-[var(--card-border)] bg-[var(--soft-surface)] px-3 py-1 text-xs font-semibold text-[var(--text-muted)]">
+        {auditResults.source === 'api'
+          ? 'Live audit generated from your onboarding input'
+          : 'Demo report shown until the backend audit API is connected'}
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <MetricCard
@@ -167,6 +175,21 @@ export function AuditResultsPage() {
       <LeadCaptureModal onClose={() => setIsLeadOpen(false)} open={isLeadOpen} />
     </div>
   )
+}
+
+function loadAuditResults() {
+  try {
+    const savedResult = window.localStorage.getItem('spendlens-audit-result')
+    const savedInput = window.localStorage.getItem('spendlens-audit-input')
+
+    return adaptAuditResult(
+      savedResult ? JSON.parse(savedResult) : null,
+      auditData.auditResults,
+      savedInput ? JSON.parse(savedInput) : null,
+    )
+  } catch {
+    return adaptAuditResult(null, auditData.auditResults, null)
+  }
 }
 
 function MetricCard({ icon: Icon, label, tone, value }) {

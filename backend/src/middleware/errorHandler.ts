@@ -18,7 +18,10 @@ export const errorHandler: ErrorRequestHandler = (error, _request, response, _ne
     response.status(400).json({
       error: {
         message: 'Validation failed',
-        details: error.flatten(),
+        details: error.issues.map((issue) => ({
+          message: issue.message,
+          path: issue.path.join('.'),
+        })),
       },
     })
     return

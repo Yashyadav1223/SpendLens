@@ -10,6 +10,16 @@ npm run lint
 npm run build
 ```
 
+## Environment
+
+Create `.env` from `.env.example` when running the backend locally:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+The audit onboarding flow posts to `POST /api/audit` and stores the generated result in localStorage. If the backend is unavailable, the UI offers a demo-report fallback so the product can still be reviewed.
+
 ## Routes
 
 - `/` landing page

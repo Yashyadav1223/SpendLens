@@ -1,6 +1,6 @@
 # Spendlens Backend Tests
 
-The backend uses Vitest for unit testing.
+The backend uses Vitest for service and route testing.
 
 ## Run Tests
 
@@ -11,7 +11,7 @@ npm run test
 
 ## Current Coverage
 
-The test suite focuses on the audit engine because it is the core product logic.
+The test suite focuses on the audit engine because it is the core product logic, with API route coverage for validation and response shape.
 
 Covered cases:
 
@@ -21,7 +21,11 @@ Covered cases:
 - High OpenAI API spend routing and caching recommendation
 - Fully optimized stack scenario
 - Claude Max downgrade recommendation for broad team usage
+- Invoice reconciliation when reported spend exceeds official list pricing
+- Unknown tools returning an honest no-savings recommendation
+- `POST /api/audit` success response shape
+- `POST /api/audit` validation failures
 
 ## Why These Tests Matter
 
-Spendlens needs to be financially honest. These tests ensure the backend can find real savings while also returning “already optimized” when the spend profile does not justify a recommendation.
+Spendlens needs to be financially honest. These tests ensure the backend can find real savings while also returning "already optimized" when the spend profile does not justify a recommendation.

@@ -48,15 +48,26 @@ export const pricingData = {
   chatgpt: {
     displayName: 'ChatGPT',
     category: 'general-ai',
-    defaultRecommendedPlan: 'team',
+    defaultRecommendedPlan: 'business',
     smallTeamPlan: 'plus',
-    officialUrl: 'https://openai.com/chatgpt/pricing',
+    officialUrl: 'https://openai.com/business/chatgpt-pricing',
     alternatives: ['Claude Team', 'Gemini AI Pro'],
     plans: {
       free: { displayName: 'Free', monthlyCost: 0, perSeat: true },
       plus: { displayName: 'Plus', monthlyCost: 20, perSeat: true },
       pro: { displayName: 'Pro', monthlyCost: 200, perSeat: true },
-      team: { displayName: 'Team', monthlyCost: 30, perSeat: true },
+      business: {
+        displayName: 'Business',
+        monthlyCost: 25,
+        perSeat: true,
+        notes: 'Business is $25/user/month when billed monthly; older Team labels are treated as Business.',
+      },
+      team: {
+        displayName: 'Business',
+        monthlyCost: 25,
+        perSeat: true,
+        notes: 'Compatibility alias for the former ChatGPT Team naming.',
+      },
       enterprise: {
         displayName: 'Enterprise',
         monthlyCost: null,
@@ -70,13 +81,25 @@ export const pricingData = {
     category: 'general-ai',
     defaultRecommendedPlan: 'team',
     smallTeamPlan: 'pro',
-    officialUrl: 'https://www.anthropic.com/pricing',
+    officialUrl: 'https://claude.com/pricing',
     alternatives: ['ChatGPT Team', 'Gemini AI Pro'],
     plans: {
       free: { displayName: 'Free', monthlyCost: 0, perSeat: true },
       pro: { displayName: 'Pro', monthlyCost: 20, perSeat: true },
       max: { displayName: 'Max', monthlyCost: 100, perSeat: true },
-      team: { displayName: 'Team', monthlyCost: 30, perSeat: true },
+      max20x: { displayName: 'Max 20x', monthlyCost: 200, perSeat: true },
+      team: {
+        displayName: 'Team Standard',
+        monthlyCost: 25,
+        perSeat: true,
+        notes: 'Monthly billing equivalent for Claude Team standard seats.',
+      },
+      teamPremium: {
+        displayName: 'Team Premium',
+        monthlyCost: 125,
+        perSeat: true,
+        notes: 'Premium team seat with 5x more usage than standard seats.',
+      },
       enterprise: {
         displayName: 'Enterprise',
         monthlyCost: null,
@@ -110,12 +133,12 @@ export const pricingData = {
     category: 'general-ai',
     defaultRecommendedPlan: 'aiPro',
     smallTeamPlan: 'aiPro',
-    officialUrl: 'https://one.google.com/about/ai-plans',
+    officialUrl: 'https://gemini.google/subscriptions',
     alternatives: ['ChatGPT Plus', 'Claude Pro'],
     plans: {
       free: { displayName: 'Free', monthlyCost: 0, perSeat: true },
-      aiPro: { displayName: 'AI Pro', monthlyCost: 20, perSeat: true },
-      aiUltra: { displayName: 'AI Ultra', monthlyCost: 250, perSeat: true },
+      aiPro: { displayName: 'AI Pro', monthlyCost: 19.99, perSeat: true },
+      aiUltra: { displayName: 'AI Ultra', monthlyCost: 249.99, perSeat: true },
       workspaceAddon: {
         displayName: 'Workspace add-on',
         monthlyCost: 30,
@@ -138,16 +161,16 @@ export const pricingData = {
     alternatives: ['GPT-5 mini routing', 'Batch API', 'Prompt caching'],
     plans: {
       gpt5: {
-        displayName: 'GPT-5 workload',
+        displayName: 'GPT-5.5 workload',
         monthlyCost: null,
         perSeat: false,
-        notes: 'Token based pricing.',
+        notes: 'Token based pricing; GPT-5.5 standard pricing starts at $5 input and $30 output per 1M tokens.',
       },
       gpt5Mini: {
-        displayName: 'GPT-5 mini workload',
+        displayName: 'GPT-5.4 mini workload',
         monthlyCost: null,
         perSeat: false,
-        notes: 'Lower-cost token based workload.',
+        notes: 'Lower-cost token based workload for coding, computer use, and subagents.',
       },
       batch: {
         displayName: 'Batch API',
@@ -203,11 +226,11 @@ export const pricingData = {
     alternatives: ['Cursor Pro', 'GitHub Copilot Business'],
     plans: {
       free: { displayName: 'Free', monthlyCost: 0, perSeat: true },
-      pro: { displayName: 'Pro', monthlyCost: 15, perSeat: true },
-      max: { displayName: 'Max', monthlyCost: 60, perSeat: true },
+      pro: { displayName: 'Pro', monthlyCost: 20, perSeat: true },
+      max: { displayName: 'Max', monthlyCost: 200, perSeat: true },
       teams: {
         displayName: 'Teams',
-        monthlyCost: 30,
+        monthlyCost: 40,
         perSeat: true,
         enterpriseAvailable: true,
       },

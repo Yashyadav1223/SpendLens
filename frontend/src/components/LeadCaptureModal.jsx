@@ -1,13 +1,47 @@
 import { useState } from 'react'
 import { Building2, CheckCircle2, Mail, UserRound, UsersRound, X } from 'lucide-react'
+import { captureLead } from '../services/apiClient'
 import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 
 export function LeadCaptureModal({ onClose, open }) {
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [form, setForm] = useState({
+    companyName: '',
+    email: '',
+    role: '',
+    teamSize: '',
+  })
 
   if (!open) {
     return null
+  }
+
+  function updateField(field, value) {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+    }))
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      await captureLead({
+        ...form,
+        teamSize: Number(form.teamSize),
+      })
+      setIsSubmitted(true)
+    } catch (captureError) {
+      setError(captureError.message)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -49,22 +83,58 @@ export function LeadCaptureModal({ onClose, open }) {
             </Button>
           </div>
         ) : (
-          <form className="mt-6 space-y-4">
-            <Input icon={Mail} label="Email" placeholder="founder@company.com" type="email" />
-            <Input icon={Building2} label="Company name" placeholder="Acme AI" />
-            <Input icon={UserRound} label="Role" placeholder="Founder, CTO, Engineering Manager" />
-            <Input icon={UsersRound} label="Team size" placeholder="12" type="number" />
+          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+            <Input
+              icon={Mail}
+              label="Email"
+              onChange={(event) => updateField('email', event.target.value)}
+              placeholder="founder@company.com"
+              required
+              type="email"
+              value={form.email}
+            />
+            <Input
+              icon={Building2}
+              label="Company name"
+              onChange={(event) => updateField('companyName', event.target.value)}
+              placeholder="Acme AI"
+              required
+              value={form.companyName}
+            />
+            <Input
+              icon={UserRound}
+              label="Role"
+              onChange={(event) => updateField('role', event.target.value)}
+              placeholder="Founder, CTO, Engineering Manager"
+              required
+              value={form.role}
+            />
+            <Input
+              icon={UsersRound}
+              label="Team size"
+              min="1"
+              onChange={(event) => updateField('teamSize', event.target.value)}
+              placeholder="12"
+              required
+              type="number"
+              value={form.teamSize}
+            />
             <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm leading-6 text-emerald-100">
               Credex will reach out with AI infrastructure credit options and a
               vendor consolidation plan.
             </div>
+            {error ? (
+              <p className="rounded-2xl border border-rose-400/20 bg-rose-400/10 p-3 text-sm text-rose-100">
+                {error}
+              </p>
+            ) : null}
             <Button
               className="w-full"
-              onClick={() => setIsSubmitted(true)}
+              disabled={isSubmitting}
               size="lg"
-              type="button"
+              type="submit"
             >
-              Request Credex Review
+              {isSubmitting ? 'Sending request...' : 'Request Credex Review'}
             </Button>
           </form>
         )}

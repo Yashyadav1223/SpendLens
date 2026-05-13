@@ -4,7 +4,7 @@ export function Input({ className, icon: Icon, label, ...props }) {
   return (
     <label className="block">
       {label ? (
-        <span className="mb-2 block text-sm font-medium text-slate-300">
+        <span className="mb-2 block text-sm font-medium text-[var(--text-soft)]">
           {label}
         </span>
       ) : null}

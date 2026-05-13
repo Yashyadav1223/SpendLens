@@ -7,6 +7,8 @@ import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { SectionHeader } from '../components/ui/SectionHeader'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { createAudit } from '../services/apiClient'
+import { buildAuditPayload } from '../utils/auditAdapters'
 import { formatCurrency } from '../utils/formatters'
 
 const steps = ['AI stack', 'Team usage', 'Review']
@@ -27,6 +29,8 @@ export function AuditInputPage() {
     'spendlens-audit-input',
     auditData.defaultAuditInput,
   )
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const selectedTools = useMemo(
     () => form.tools.filter((tool) => tool.selected),
@@ -67,6 +71,26 @@ export function AuditInputPage() {
           : [...current.painPoints, point],
       }
     })
+  }
+
+  async function handleGenerateAudit() {
+    setIsSubmitting(true)
+    setSubmitError('')
+
+    try {
+      const auditResult = await createAudit(buildAuditPayload(form))
+      window.localStorage.setItem('spendlens-audit-result', JSON.stringify(auditResult))
+      navigate('/app')
+    } catch (error) {
+      setSubmitError(error.message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  function handleDemoAudit() {
+    window.localStorage.removeItem('spendlens-audit-result')
+    navigate('/app')
   }
 
   return (
@@ -132,7 +156,7 @@ export function AuditInputPage() {
                             {toolMeta.name}
                           </h4>
                           <p className="text-sm text-[var(--text-muted)]">
-                            {toolMeta.vendor} · {toolMeta.category}
+                            {toolMeta.vendor} - {toolMeta.category}
                           </p>
                         </div>
                         <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-slate-300">
@@ -302,7 +326,7 @@ export function AuditInputPage() {
                 </h3>
                 <p className="mt-2 text-sm text-[var(--text-muted)]">
                   Review the inputs saved in localStorage, then generate the
-                  demo audit result.
+                  audit using the Spendlens backend.
                 </p>
               </div>
               <div className="grid gap-4 md:grid-cols-3">
@@ -320,6 +344,24 @@ export function AuditInputPage() {
                   </p>
                 </div>
               </div>
+              {submitError ? (
+                <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 p-4">
+                  <p className="text-sm font-semibold text-rose-200">
+                    Audit API unavailable
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-rose-100/80">
+                    {submitError}
+                  </p>
+                  <Button
+                    className="mt-4"
+                    onClick={handleDemoAudit}
+                    type="button"
+                    variant="secondary"
+                  >
+                    Continue with demo report
+                  </Button>
+                </div>
+              ) : null}
             </Card>
           ) : null}
 
@@ -343,8 +385,13 @@ export function AuditInputPage() {
                 Continue
               </Button>
             ) : (
-              <Button icon={ArrowRight} onClick={() => navigate('/app')} type="button">
-                Generate Audit Results
+              <Button
+                disabled={isSubmitting}
+                icon={ArrowRight}
+                onClick={handleGenerateAudit}
+                type="button"
+              >
+                {isSubmitting ? 'Generating audit...' : 'Generate Audit Results'}
               </Button>
             )}
           </div>

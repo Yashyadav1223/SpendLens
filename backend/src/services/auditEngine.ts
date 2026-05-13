@@ -22,6 +22,14 @@ type ToolContext = {
   selectedToolKeys: Set<string>
 }
 
+type SavingsCandidate = {
+  amount: number
+  recommendedPlan: string
+  action: string
+  alternative: string
+  reason: string
+}
+
 export function runAudit(input: AuditInput): AuditResult {
   const currentMonthlySpend = roundMoney(
     input.tools.reduce((sum, tool) => sum + tool.monthlySpend, 0),
@@ -102,20 +110,23 @@ export function analyzeTool(
   const currentCost = roundMoney(toolInput.monthlySpend)
 
   if (toolPricing.category === 'model-api') {
-    return analyzeApiSpend(toolInput, toolPricing, currentCost)
+    return analyzeApiSpend(toolInput, toolPricing, currentCost, context)
   }
 
   const seatSavings = calculateSeatWasteSavings(toolInput, currentPlan, context)
   const planSavings = calculatePlanSavings(toolInput, toolPricing, currentPlan, context)
-  const overspendSavings = calculateBenchmarkOverspend(
+  const benchmarkSavings = calculateBenchmarkOverspend(
     currentCost,
     planCost,
     currentPlan,
+    toolInput.seats,
   )
 
-  const bestSavings = Math.max(seatSavings.amount, planSavings.amount, overspendSavings)
+  const bestCandidate = [seatSavings, planSavings, benchmarkSavings]
+    .filter((candidate) => candidate.amount > 0)
+    .sort((a, b) => b.amount - a.amount)[0]
 
-  if (bestSavings <= 0) {
+  if (!bestCandidate) {
     return optimizedBreakdown(
       toolInput,
       currentPlan.displayName,
@@ -124,20 +135,19 @@ export function analyzeTool(
     )
   }
 
-  const preferred = [seatSavings, planSavings].sort((a, b) => b.amount - a.amount)[0]
-  const monthlySavings = roundMoney(bestSavings)
+  const monthlySavings = roundMoney(bestCandidate.amount)
 
   return {
     tool: toolPricing.displayName,
     currentPlan: currentPlan.displayName,
     currentCost,
-    recommendedPlan: preferred.recommendedPlan,
-    recommendedAction: preferred.action,
-    suggestedAlternative: preferred.alternative,
+    recommendedPlan: bestCandidate.recommendedPlan,
+    recommendedAction: bestCandidate.action,
+    suggestedAlternative: bestCandidate.alternative,
     monthlySavings,
     annualSavings: roundMoney(monthlySavings * 12),
-    reason: preferred.reason,
-    severity: monthlySavings >= 500 ? 'critical' : monthlySavings >= 150 ? 'high' : 'medium',
+    reason: bestCandidate.reason,
+    severity: classifySeverity(monthlySavings),
   }
 }
 
@@ -145,6 +155,7 @@ function analyzeApiSpend(
   toolInput: ToolSpendInput,
   toolPricing: ToolPricing,
   currentCost: number,
+  context: ToolContext,
 ): AuditBreakdownItem {
   const benchmark = toolPricing.benchmarkMonthlySpend ?? 750
   const highSpend = currentCost > benchmark * 1.25
@@ -159,22 +170,22 @@ function analyzeApiSpend(
     )
   }
 
-  const savingsRate = currentCost >= 2000 ? 0.28 : currentCost >= 1000 ? 0.22 : 0.15
+  const savingsRate =
+    currentCost >= 5000 ? 0.32 : currentCost >= 2000 ? 0.28 : currentCost >= 1000 ? 0.22 : 0.15
   const monthlySavings = roundMoney(currentCost * savingsRate)
+  const workloadAction = getApiWorkloadAction(context.useCase)
 
   return {
     tool: toolPricing.displayName,
     currentPlan: toolInput.plan,
     currentCost,
     recommendedPlan: toolPricing.defaultRecommendedPlan,
-    recommendedAction:
-      'Introduce model routing, caching, and batch processing for low-risk workloads.',
+    recommendedAction: workloadAction,
     suggestedAlternative: toolPricing.alternatives.join(' + '),
     monthlySavings,
     annualSavings: roundMoney(monthlySavings * 12),
-    reason:
-      'API spend is usage-driven, so the best savings usually come from workload tiering instead of a simple plan downgrade.',
-    severity: monthlySavings >= 500 ? 'critical' : 'high',
+    reason: `API spend is ${roundMoney(currentCost / benchmark)}x the current benchmark for a ${context.teamSize}-person ${context.useCase.toLowerCase()} team, so savings should come from routing, caching, batching, or credits rather than a fake plan downgrade.`,
+    severity: classifySeverity(monthlySavings),
   }
 }
 
@@ -182,7 +193,7 @@ function calculateSeatWasteSavings(
   toolInput: ToolSpendInput,
   currentPlan: PricingPlan,
   context: ToolContext,
-) {
+): SavingsCandidate {
   if (!currentPlan.perSeat || toolInput.seats <= context.teamSize || toolInput.seats === 0) {
     return noSavings('Keep current seats')
   }
@@ -206,7 +217,7 @@ function calculatePlanSavings(
   toolPricing: ToolPricing,
   currentPlan: PricingPlan,
   context: ToolContext,
-) {
+): SavingsCandidate {
   if (toolInput.seats === 0) {
     return noSavings(currentPlan.displayName)
   }
@@ -215,16 +226,17 @@ function calculatePlanSavings(
   const isTeamPlan = ['business', 'teams', 'team', 'enterprise'].some((keyword) =>
     normalizedPlan.includes(keyword),
   )
-  const isPowerPlan = ['max', 'ultra', 'proplus', 'business'].some((keyword) =>
+  const isPowerPlan = ['max', 'ultra', 'proplus', 'aiultra'].some((keyword) =>
     normalizedPlan.includes(keyword),
   )
   const smallTeam = context.teamSize <= 3
+  const hasAdminPlanWithoutAdminNeed = smallTeam && isTeamPlan
 
-  if (!smallTeam && !isPowerPlan) {
+  if (!hasAdminPlanWithoutAdminNeed && !isPowerPlan) {
     return noSavings(currentPlan.displayName)
   }
 
-  const targetPlanKey = smallTeam && toolPricing.smallTeamPlan
+  const targetPlanKey = hasAdminPlanWithoutAdminNeed && toolPricing.smallTeamPlan
     ? toolPricing.smallTeamPlan
     : toolPricing.defaultRecommendedPlan
   const targetPlan = toolPricing.plans[targetPlanKey]
@@ -236,18 +248,18 @@ function calculatePlanSavings(
   const targetCost = estimatePlanCost(targetPlan, toolInput.seats)
   const amount = roundMoney(Math.max(toolInput.monthlySpend - targetCost, 0))
 
-  if (amount <= 0 || (!isTeamPlan && !isPowerPlan)) {
+  if (amount <= 0 || (!hasAdminPlanWithoutAdminNeed && !isPowerPlan)) {
     return noSavings(currentPlan.displayName)
   }
 
   return {
     amount,
     recommendedPlan: targetPlan.displayName,
-    action: smallTeam
+    action: hasAdminPlanWithoutAdminNeed
       ? 'Downgrade to the lower self-serve plan until team controls are needed.'
       : 'Move non-power users to the standard team plan and reserve premium access for heavy users.',
     alternative: `${targetPlan.displayName} for active users`,
-    reason: smallTeam
+    reason: hasAdminPlanWithoutAdminNeed
       ? 'Business or team controls are usually unnecessary for very small teams unless SSO, audit logs, or centralized billing are required.'
       : 'Power plans should be limited to users with heavy context, agentic, or production-critical workloads.',
   }
@@ -257,13 +269,27 @@ function calculateBenchmarkOverspend(
   currentCost: number,
   expectedCost: number,
   currentPlan: PricingPlan,
-) {
+  seats: number,
+): SavingsCandidate {
   if (expectedCost <= 0 || currentPlan.monthlyCost === null) {
-    return 0
+    return noSavings(currentPlan.displayName)
   }
 
   const threshold = expectedCost * 1.2
-  return currentCost > threshold ? roundMoney(currentCost - expectedCost) : 0
+  const amount = currentCost > threshold ? roundMoney(currentCost - expectedCost) : 0
+
+  if (amount <= 0) {
+    return noSavings(currentPlan.displayName)
+  }
+
+  return {
+    amount,
+    recommendedPlan: currentPlan.displayName,
+    action: 'Reconcile invoice spend against active seats and included usage before renewal.',
+    alternative: `${seats} active seat${seats === 1 ? '' : 's'} at official list pricing`,
+    reason:
+      'Reported spend is materially above list-price expectations for the selected plan, which often means stale seats, legacy overages, or add-on usage hidden in the invoice.',
+  }
 }
 
 function estimatePlanCost(plan: PricingPlan, seats: number): number {
@@ -311,7 +337,7 @@ function optimizedBreakdown(
   }
 }
 
-function noSavings(recommendedPlan: string) {
+function noSavings(recommendedPlan: string): SavingsCandidate {
   return {
     amount: 0,
     recommendedPlan,
@@ -319,6 +345,34 @@ function noSavings(recommendedPlan: string) {
     alternative: 'No immediate change',
     reason: 'Current spend appears reasonable.',
   }
+}
+
+function classifySeverity(monthlySavings: number): RecommendationSeverity {
+  if (monthlySavings >= 500) {
+    return 'critical'
+  }
+
+  if (monthlySavings >= 150) {
+    return 'high'
+  }
+
+  if (monthlySavings >= 50) {
+    return 'medium'
+  }
+
+  return 'low'
+}
+
+function getApiWorkloadAction(useCase: AuditInput['useCase']) {
+  if (useCase === 'Coding') {
+    return 'Route autocomplete, tests, and low-risk refactors to cheaper models while reserving frontier models for architecture and review.'
+  }
+
+  if (useCase === 'Research' || useCase === 'Data Analysis') {
+    return 'Batch recurring analysis, cache long-context prompts, and reserve premium models for high-judgment research steps.'
+  }
+
+  return 'Classify workloads by risk, add prompt caching, and route routine tasks to lower-cost models before they hit frontier APIs.'
 }
 
 function buildStackRecommendations(input: {
@@ -362,6 +416,29 @@ function buildStackRecommendations(input: {
       description:
         'Cursor and GitHub Copilot can both be valuable, but paying for both across every engineer often creates duplicated spend.',
       impact: 'Reduce duplicate seat cost',
+      severity: 'high',
+    })
+  }
+
+  if (
+    input.context.selectedToolKeys.has('openaiApi') &&
+    input.context.selectedToolKeys.has('anthropicApi')
+  ) {
+    recommendations.push({
+      title: 'Separate API workloads into cost tiers.',
+      description:
+        'Keeping OpenAI and Anthropic is reasonable, but each production path should have a default, fallback, and batch model so high-cost models are used intentionally.',
+      impact: 'Reduce token waste without losing model quality',
+      severity: 'high',
+    })
+  }
+
+  if (input.context.monthlyAiBudget && input.currentMonthlySpend > input.context.monthlyAiBudget) {
+    recommendations.push({
+      title: 'Create a renewal guardrail before adding more seats.',
+      description:
+        'Current AI spend is already above the declared monthly budget. Freeze new seats until owners review utilization, renewal dates, and API usage spikes.',
+      impact: 'Bring spend back inside budget',
       severity: 'high',
     })
   }

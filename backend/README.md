@@ -11,7 +11,7 @@ Spendlens analyzes AI tool spend across products such as ChatGPT, Claude, Cursor
 - Supabase PostgreSQL
 - Zod validation
 - express-rate-limit
-- Anthropic API with template fallback
+- Gemini API with Claude and template fallback
 - Resend transactional email
 - Vitest unit tests
 
@@ -44,9 +44,10 @@ Required for full production behavior:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `RESEND_API_KEY`
-- `ANTHROPIC_API_KEY`
+- `GEMINI_API_KEY`
+- `ANTHROPIC_API_KEY` for Claude fallback
 
-If Supabase, Resend, or Anthropic are not configured, the backend uses safe local fallbacks for development.
+If Supabase, Resend, Gemini, or Anthropic are not configured, the backend uses safe local fallbacks for development.
 
 ## API Overview
 
@@ -82,7 +83,7 @@ Returns:
 
 ### `POST /api/summary`
 
-Generates a concise AI audit summary using Anthropic. Falls back to a template if the API fails.
+Generates a concise AI audit summary using Gemini first, Claude second, and a template fallback if both AI providers fail.
 
 ### `POST /api/leads`
 
