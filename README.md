@@ -10,11 +10,17 @@ Spendlens is a B2B SaaS AI infrastructure spend audit platform for startup found
 
 ## Screenshots
 
-Add screenshots before final submission:
+### Landing page
 
-1. Landing page hero and CTA
-2. Multi-step AI spend audit form
-3. Audit results dashboard with savings and recommendations
+![Spendlens landing page](screenshots/landing-page.png)
+
+### Audit results dashboard
+
+![Spendlens audit results dashboard](screenshots/audit-results.png)
+
+### Shareable audit report
+
+![Spendlens shareable report](screenshots/shareable-report.png)
 
 ## Tech Stack
 
