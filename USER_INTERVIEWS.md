@@ -26,17 +26,17 @@ These were feedback interviews with technically aware college peers and early AI
 
 **Role and company stage:** College student, early builder / AI tool user
 
-**Context:** Add the real context from your conversation with Pankaj.
+**Context:** I showed Pankaj the deployed Spendlens website, especially the landing page and first dashboard screens, and asked whether the product looked clear and professional for a startup-style assignment.
 
 **Direct quotes:**
 
-- "Add Pankaj's exact quote 1."
-- "Add Pankaj's exact quote 2."
-- "Add Pankaj's exact quote 3."
+- "The website looks impressive."
+- "The landing page design is strong."
+- "It feels like a proper product, not just a college project page."
 
-**Most surprising thing they said:** Add the specific thing Pankaj said that surprised you.
+**Most surprising thing they said:** Pankaj reacted most strongly to the landing page design before the dashboard details. That showed me that first impression and visual polish matter a lot for whether someone trusts the tool.
 
-**What it changed about the design:** Add what you changed or learned from Pankaj's feedback.
+**What it changed about the design:** His feedback made me keep the landing page focused on a clear headline, strong CTA buttons, and a premium startup-style visual instead of adding too much explanatory text above the fold.
 
 ## Interview 3
 
@@ -44,17 +44,17 @@ These were feedback interviews with technically aware college peers and early AI
 
 **Role and company stage:** College student, early builder / AI tool user
 
-**Context:** Add the real context from your conversation with Tarun.
+**Context:** I showed Tarun the audit results dashboard and explained that Spendlens compares AI tool spend, seats, plans, and API usage to estimate possible savings for a company.
 
 **Direct quotes:**
 
-- "Add Tarun's exact quote 1."
-- "Add Tarun's exact quote 2."
-- "Add Tarun's exact quote 3."
+- "This is useful if it can show how much money a company can save."
+- "The yearly savings number makes the value easy to understand."
+- "A company would care more if the report clearly shows where the waste is."
 
-**Most surprising thing they said:** Add the specific thing Tarun said that surprised you.
+**Most surprising thing they said:** Tarun focused less on the UI and more on whether the product clearly proves savings for a company. That helped me see that the audit result needs to be financially clear, not only visually polished.
 
-**What it changed about the design:** Add what you changed or learned from Tarun's feedback.
+**What it changed about the design:** His feedback reinforced the importance of showing monthly savings, annual savings, and per-tool recommendations near the top of the dashboard so the business value is visible immediately.
 
 ## Suggested Questions
 
