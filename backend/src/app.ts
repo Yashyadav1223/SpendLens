@@ -12,6 +12,9 @@ import { summaryRouter } from './routes/summaryRoutes.js'
 
 export const app = express()
 
+// Trust proxy required for Render deployment and express-rate-limit
+app.set('trust proxy', 1)
+
 app.use(helmet())
 app.use(
   cors({
