@@ -95,7 +95,7 @@ export function AuditInputPage() {
       // Now create the shareable report in Supabase from this audit
       try {
         await createReport({
-          title: `Audit - ${new Date().toISOString().split('T')[0]}`,
+          title: `Audit - ${new Date().toISOString().split("T")[0]}`,
           auditInput: payload,
           auditResult: auditResult,
         });
